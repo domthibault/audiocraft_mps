@@ -6,28 +6,101 @@
 AudioCraft is a PyTorch library for deep learning research on audio generation. AudioCraft contains inference and training code
 for two state-of-the-art AI generative models producing high-quality audio: AudioGen and MusicGen.
 
+This fork is focusing on getting the scripts to work locally with MacOS GPUs (MPS). Not all functions are implemented. It is a work in progress for the benefit of the MUS6329X students.
+
 
 ## Installation
 AudioCraft requires Python 3.9, PyTorch 2.1.0. To install AudioCraft, you can run the following:
 
+### Installing Homebrew
+First things first, you will need Homebrew, a package manager for macOS and Linux. Homebrew will allow us to install the necessary dependencies. If you don't have it installed, you can do so by running the following command in your terminal:
 ```shell
-# Best to make sure you have torch installed first, in particular before installing xformers.
-# Don't run this if you already have PyTorch installed.
-python -m pip install 'torch==2.1.0'
-# You might need the following before trying to install the packages
-python -m pip install setuptools wheel
-# Then proceed to one of the following
-python -m pip install -U audiocraft  # stable release
-python -m pip install -U git+https://git@github.com/facebookresearch/audiocraft#egg=audiocraft  # bleeding edge
-python -m pip install -e .  # or if you cloned the repo locally (mandatory if you want to train).
-python -m pip install -e '.[wm]'  # if you want to train a watermarking model
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+Alternatively, you can download the latest Homebrew package from here: https://github.com/Homebrew/brew/releases/tag/4.4.23
+
+### Installing general dependancies
+Three packages need to be installed in priority using Homebrew: ffmpeg, openmp and llvm. Here are the commands to install them:
+
+#### ffmpeg
+```shell
+# Install ffmpeg for your whole computer
+brew install ffmpeg
 ```
 
-We also recommend having `ffmpeg` installed, either through your system or Anaconda:
-```bash
-sudo apt-get install ffmpeg
-# Or if you are using Anaconda or Miniconda
-conda install "ffmpeg<5" -c conda-forge
+#### openmp
+```shell
+#Install openmp for your whole computer
+brew install libomp
+
+#Export the environment variables for the openmp library
+export PATH="/opt/homebrew/opt/libomp/bin:$PATH"
+export LDFLAGS="-L/opt/homebrew/opt/libomp/lib"
+export CPPFLAGS="-I/opt/homebrew/opt/libomp/include"
+```
+
+#### llvm
+```shell
+#Install llvm for your whole computer
+brew install llvm
+
+#Export the environment variables for the llvm library
+export PATH="/opt/homebrew/opt/llvm/bin:$PATH"
+export LDFLAGS="-L/opt/homebrew/opt/llvm/lib"
+export CPPFLAGS="-I/opt/homebrew/opt/llvm/include"
+```
+
+## Create a folder and copy the repository
+Create a folder and a virtual environment to install of all other dependencies. Use the following commands:
+```shell
+#Create a folder for the project
+mkdir audiocraft_mps #the folder will be created in the home directory
+cd audiocraft_mps #move into the folder
+
+#Clone the repository (get files from GitHub)
+git clone https://github.com/domthibault/audiocraft_mps.git
+```
+
+### Create virtual environment
+Create a virtual environment to install of all other dependencies. Use the following commands:
+```shell
+#Create the virtual environment
+python3 -m venv venv
+
+#Activate the virtual environment
+source venv/bin/activate
+```
+
+### Installing project requirements
+Now that you have installed Homebrew and the general dependencies, you can install PyTorch. Run the following command:
+```shell
+#Have wheel installed first
+python -m pip install setuptools wheel
+
+# Best to make sure you have torch installed first, in particular before installing xformers.
+pip install torch
+pip install -r requirements.txt #This will install all the necessary dependencies except xformers, which we will install last.
+```
+Once the requirements are installed, you can install xformers using the following command:
+```shell
+#Install xformers
+pip install xformers
+```
+To make sure everything is in place, run the setup.py script
+```shell
+#Run the setup.py script
+python setup.py install 
+```
+### Testing inference
+You'll have to create a Hugging Face account (if you don't already have one). Once create, find in your account settings, the section to create Access Tokens. Create one and keep it handy. You will need it to log in and download models.
+```shell
+#Connect to Hugging Face using your API key
+huggingface-cli login
+#You will be asked your Access Token. You can find it in your Hugging Face account settings. 
+#If you say (Y)es to the question, the token will be saved for future use.
+
+#Test the inference using AudioGen
+python ./demos/test_audiogen.py "Dog barking" --output ./generated_audio/dog_barking.wav
 ```
 
 ## Models

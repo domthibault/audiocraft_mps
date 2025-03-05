@@ -249,7 +249,13 @@ class EncodecModel(CompressionModel):
             out (torch.Tensor): Float tensor of shape [B, C, T], the reconstructed audio.
         """
         emb = self.decode_latent(codes)
-        out = self.decoder(emb)
+        # out = self.decoder(emb)
+        # Below if block is added based on https://github.com/facebookresearch/audiocraft/issues/31
+        if emb.device.type == 'mps':
+            # XXX: Since mps-decoder does not work, cpu-decoder is used instead
+            out = self.decoder.to('cpu')(emb.to('cpu')).to('mps')
+        else:
+            out = self.decoder(emb)
         out = self.postprocess(out, scale)
         # out contains extra padding added by the encoder and decoder
         return out
