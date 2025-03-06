@@ -53,12 +53,11 @@ export CPPFLAGS="-I/opt/homebrew/opt/llvm/include"
 ## Create a folder and copy the repository
 Create a folder and a virtual environment to install of all other dependencies. Use the following commands:
 ```shell
-#Create a folder for the project
-mkdir audiocraft_mps #the folder will be created in the home directory
-cd audiocraft_mps #move into the folder
-
-#Clone the repository (get files from GitHub)
+#Clone the repository (get files from GitHub) and, at the same time, create a folder for the project
 git clone https://github.com/domthibault/audiocraft_mps.git
+
+#Move into the folder
+cd audiocraft_mps 
 ```
 
 ### Create virtual environment
@@ -100,7 +99,7 @@ huggingface-cli login
 #If you say (Y)es to the question, the token will be saved for future use.
 
 #Test the inference using AudioGen
-python ./demos/test_audiogen.py "Dog barking" --output ./generated_audio/dog_barking.wav
+python ./demos/test_audiogen.py "Dog barking" --output ./generated_audio
 ```
 
 ## Models
